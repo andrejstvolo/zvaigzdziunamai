@@ -18,6 +18,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CMS, getLocalized } from './cms';
 import { authAPI } from './api';
+import { BookingWizard } from './components/BookingWizard';
 import './i18n';
 import './App.css';
 
@@ -982,26 +983,7 @@ function App() {
           </main>
           
           {/* Modals */}
-          <Dialog open={isBookingOpen} onOpenChange={setIsBookingOpen}>
-            <DialogContent className={`max-w-lg ${isDark ? 'bg-[#141B24] border-white/10 text-ivory' : 'bg-white border-gray-200'}`}>
-              <DialogHeader>
-                <DialogTitle>{user ? 'Užsakymas' : 'Užsakymas (reikalinga prisijungti)'}</DialogTitle>
-              </DialogHeader>
-              <div className="text-center py-8">
-                <p className="text-slate mb-4">Pasirinkite užsakymo tipą:</p>
-                <div className="flex gap-4">
-                  <Button onClick={() => { setIsBookingOpen(false); }} className="flex-1 bg-gold text-[#0B0F17]">
-                    <Tent className="w-5 h-5 mr-2" />
-                    Apgyvendinimas
-                  </Button>
-                  <Button onClick={() => { setIsBookingOpen(false); }} variant="outline" className="flex-1 border-white/10">
-                    <Droplets className="w-5 h-5 mr-2" />
-                    Sporto aikštelė
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <BookingWizard isOpen={isBookingOpen} onClose={() => setIsBookingOpen(false)} />
           
           <LoginModal 
             isOpen={isLoginOpen} 
