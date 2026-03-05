@@ -461,10 +461,27 @@ const LoginModal = ({ isOpen, onClose, onSuccess }: { isOpen: boolean; onClose: 
         
         <div className="space-y-4">
           {mode === 'register' && (
-            <Input placeholder={t('booking.name')} value={name} onChange={(e) => setName(e.target.value)} className="bg-[#0B0F17] border-white/10" />
+            <Input 
+              placeholder={t('booking.name')} 
+              value={name} 
+              onChange={(e) => setName(e.target.value)} 
+              className={`${isDark ? 'bg-[#0B0F17] border-white/10 text-ivory placeholder:text-slate' : 'bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-500'}`} 
+            />
           )}
-          <Input type="email" placeholder={t('booking.email')} value={email} onChange={(e) => setEmail(e.target.value)} className="bg-[#0B0F17] border-white/10" />
-          <Input type="password" placeholder={t('auth.password')} value={password} onChange={(e) => setPassword(e.target.value)} className="bg-[#0B0F17] border-white/10" />
+          <Input 
+            type="email" 
+            placeholder={t('booking.email')} 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            className={`${isDark ? 'bg-[#0B0F17] border-white/10 text-ivory placeholder:text-slate' : 'bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-500'}`} 
+          />
+          <Input 
+            type="password" 
+            placeholder={t('auth.password')} 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)} 
+            className={`${isDark ? 'bg-[#0B0F17] border-white/10 text-ivory placeholder:text-slate' : 'bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-500'}`} 
+          />
           
           <Button onClick={handleSubmit} className="w-full bg-gold text-[#0B0F17]">
             {mode === 'login' ? t('auth.login') : t('auth.register')}

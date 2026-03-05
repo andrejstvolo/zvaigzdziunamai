@@ -1,5 +1,6 @@
 // API Service for Žvaigždžių Namai
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.zvaigzdziunamai.lt/api';
+// Use same domain for API - backend runs on port 3001 behind nginx proxy
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://zvaigzdziunamai.lt/api';
 
 // Helper for API calls
 async function fetchAPI(endpoint: string, options: RequestInit = {}) {
