@@ -108,7 +108,7 @@ const ThemeToggle = () => {
 };
 
 // Navigation
-const Navigation = ({ onLoginClick }: { onLoginClick: () => void }) => {
+const Navigation = ({ onLoginClick, bannerVisible = false }: { onLoginClick: () => void, bannerVisible?: boolean }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { t } = useTranslation();
@@ -137,13 +137,21 @@ const Navigation = ({ onLoginClick }: { onLoginClick: () => void }) => {
   };
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+    <nav className={`fixed left-0 right-0 z-50 transition-all duration-300 ${
+      bannerVisible ? 'top-[48px]' : 'top-0'
+    } ${
       scrolled ? (isDark ? 'bg-[#0B0F17]/95 backdrop-blur-md shadow-lg' : 'bg-white/95 backdrop-blur-md shadow-lg') : 'bg-transparent'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
-          <button onClick={() => scrollTo('hero')} className="flex items-center gap-2">
-            <img src={isDark ? "/logo-gold.png" : "/logo-dark.png"} alt="Logo" className="h-10 w-auto" />
+          <button onClick={() => scrollTo('hero')} className="flex items-center gap-2 group">
+            <div className={`relative h-10 px-2 py-1 rounded-lg transition-all ${scrolled ? '' : 'bg-black/30 backdrop-blur-sm'}`}>
+              <img 
+                src={isDark ? "/logo-gold.png" : "/logo-dark.png"} 
+                alt="Žvaigždžių Namai" 
+                className="h-8 w-auto object-contain" 
+              />
+            </div>
           </button>
           
           <div className="hidden lg:flex items-center gap-6">
@@ -946,7 +954,7 @@ function App() {
       <AuthContext.Provider value={{ user, login, logout, register, loading: authLoading }}>
         <div className={`min-h-screen transition-colors ${isDark ? 'bg-[#0B0F17]' : 'bg-white'}`}>
           {showBanner && <SpecialOfferBanner onClose={() => setShowBanner(false)} />}
-          <Navigation onLoginClick={() => user ? setIsDashboardOpen(true) : setIsLoginOpen(true)} />
+          <Navigation onLoginClick={() => user ? setIsDashboardOpen(true) : setIsLoginOpen(true)} bannerVisible={showBanner} />
           
           <main>
             <HeroSection onBook={() => setIsBookingOpen(true)} />
