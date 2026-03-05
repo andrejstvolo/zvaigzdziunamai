@@ -1,0 +1,1454 @@
+import { useEffect, useRef, useState } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useTranslation } from 'react-i18next';
+import { 
+  MapPin, 
+  Users, 
+  Flame, 
+  Droplets, 
+  Utensils,
+  Star,
+  Phone,
+  Mail,
+  ChevronRight,
+  Check,
+  Globe,
+  Lock,
+  Settings,
+  Edit3,
+  ExternalLink
+} from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { CONFIG, getCurrentPrice, languages } from './config';
+import './i18n';
+import './App.css';
+
+gsap.registerPlugin(ScrollTrigger);
+
+// Types
+interface BookingData {
+  accommodationId: string;
+  checkIn: Date | undefined;
+  checkOut: Date | undefined;
+  guests: number;
+  name: string;
+  email: string;
+  phone: string;
+  paymentMethod: string;
+  activities: string[];
+}
+
+// Language Switcher
+const LanguageSwitcher = () => {
+  const { i18n } = useTranslation();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const changeLanguage = (code: string) => {
+    i18n.changeLanguage(code);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 text-slate hover:text-ivory transition-colors"
+      >
+        <Globe className="w-4 h-4" />
+        <span className="text-micro">{i18n.language.toUpperCase()}</span>
+      </button>
+      
+      {isOpen && (
+        <div className="absolute right-0 top-full mt-2 bg-[#141B24] border border-white/10 rounded-lg overflow-hidden z-50">
+          {languages.map((lang) => (
+            <button
+              key={lang.code}
+              onClick={() => changeLanguage(lang.code)}
+              className={`block w-full px-4 py-2 text-left text-sm hover:bg-white/5 transition-colors ${
+                i18n.language === lang.code ? 'text-gold' : 'text-ivory'
+              }`}
+            >
+              {lang.flag} {lang.name}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Pinned Section Component
+interface PinnedSectionProps {
+  id: string;
+  backgroundImage: string;
+  headline: string;
+  body: string;
+  fabLabel: string;
+  onFabClick: () => void;
+  zIndex: number;
+}
+
+const PinnedSection = ({ 
+  id, 
+  backgroundImage, 
+  headline, 
+  body, 
+  fabLabel, 
+  onFabClick, 
+  zIndex 
+}: PinnedSectionProps) => {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const bgRef = useRef<HTMLDivElement>(null);
+  const headlineRef = useRef<HTMLHeadingElement>(null);
+  const bodyRef = useRef<HTMLParagraphElement>(null);
+  const fabRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    const bg = bgRef.current;
+    const headlineEl = headlineRef.current;
+    const bodyEl = bodyRef.current;
+    const fab = fabRef.current;
+
+    if (!section || !bg || !headlineEl || !bodyEl || !fab) return;
+
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: 'top top',
+          end: '+=130%',
+          pin: true,
+          scrub: 0.6,
+          onLeaveBack: () => {
+            gsap.set([headlineEl, bodyEl, fab], { opacity: 1, x: 0, y: 0 });
+            gsap.set(bg, { scale: 1, y: 0, opacity: 1 });
+          }
+        }
+      });
+
+      tl.fromTo(bg, 
+        { scale: 1.10, opacity: 0.6 },
+        { scale: 1, opacity: 1, ease: 'none' },
+        0
+      );
+      
+      tl.fromTo(headlineEl,
+        { x: '-50vw', opacity: 0 },
+        { x: 0, opacity: 1, ease: 'power2.out' },
+        0
+      );
+      
+      tl.fromTo(bodyEl,
+        { y: '10vh', opacity: 0 },
+        { y: 0, opacity: 1, ease: 'power2.out' },
+        0.05
+      );
+      
+      tl.fromTo(fab,
+        { x: '20vw', opacity: 0, scale: 0.9 },
+        { x: 0, opacity: 1, scale: 1, ease: 'back.out(1.6)' },
+        0.10
+      );
+
+      tl.to(headlineEl,
+        { x: '18vw', opacity: 0, ease: 'power2.in' },
+        0.70
+      );
+      
+      tl.to(bodyEl,
+        { y: '-8vh', opacity: 0, ease: 'power2.in' },
+        0.70
+      );
+      
+      tl.to(fab,
+        { x: '14vw', opacity: 0, ease: 'power2.in' },
+        0.70
+      );
+      
+      tl.to(bg,
+        { scale: 1.06, y: '-6vh', opacity: 0, ease: 'power2.in' },
+        0.70
+      );
+    }, section);
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section 
+      ref={sectionRef}
+      id={id}
+      className="section-pinned"
+      style={{ zIndex }}
+    >
+      <div 
+        ref={bgRef}
+        className="absolute inset-0 w-full h-full"
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      />
+      <div className="vignette-overlay absolute inset-0" />
+      
+      <div className="absolute left-[7vw] top-[60vh] w-[74vw] max-w-4xl">
+        <h2 
+          ref={headlineRef}
+          className="text-display text-ivory text-[clamp(32px,4.2vw,64px)] mb-6 will-change-transform"
+        >
+          {headline}
+        </h2>
+        <p 
+          ref={bodyRef}
+          className="text-slate text-[clamp(14px,1.2vw,18px)] leading-relaxed max-w-2xl will-change-transform"
+        >
+          {body}
+        </p>
+      </div>
+      
+      <button
+        ref={fabRef}
+        onClick={onFabClick}
+        className="fab-button absolute right-[4vw] bottom-[5vh] will-change-transform"
+      >
+        <span className="text-gold text-xs font-semibold uppercase tracking-wider">{fabLabel}</span>
+      </button>
+    </section>
+  );
+};
+
+// Hero Section
+const HeroSection = ({ onBookClick }: { onBookClick: () => void }) => {
+  const { t } = useTranslation();
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const bgRef = useRef<HTMLDivElement>(null);
+  const labelRef = useRef<HTMLSpanElement>(null);
+  const headlineRef = useRef<HTMLHeadingElement>(null);
+  const subheadRef = useRef<HTMLParagraphElement>(null);
+  const fabRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    const bg = bgRef.current;
+    const label = labelRef.current;
+    const headline = headlineRef.current;
+    const subhead = subheadRef.current;
+    const fab = fabRef.current;
+
+    if (!section || !bg || !label || !headline || !subhead || !fab) return;
+
+    const entranceTl = gsap.timeline({ delay: 0.2 });
+    
+    entranceTl.fromTo(bg,
+      { scale: 1.08, opacity: 0 },
+      { scale: 1, opacity: 1, duration: 1.0, ease: 'power2.out' }
+    );
+    
+    entranceTl.fromTo(label,
+      { y: -10, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out' },
+      '-=0.6'
+    );
+    
+    entranceTl.fromTo(headline,
+      { y: 28, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.9, ease: 'power2.out' },
+      '-=0.4'
+    );
+    
+    entranceTl.fromTo(subhead,
+      { y: 14, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.7, ease: 'power2.out' },
+      '-=0.5'
+    );
+    
+    entranceTl.fromTo(fab,
+      { scale: 0.85, opacity: 0 },
+      { scale: 1, opacity: 1, duration: 0.6, ease: 'back.out(1.6)' },
+      '-=0.4'
+    );
+
+    const ctx = gsap.context(() => {
+      gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: 'top top',
+          end: '+=130%',
+          scrub: 0.6,
+          onLeaveBack: () => {
+            gsap.set([label, headline, subhead, fab], { opacity: 1, x: 0, y: 0 });
+            gsap.set(bg, { scale: 1, y: 0 });
+          }
+        }
+      })
+      .to([label, headline, subhead], 
+        { y: '-18vh', opacity: 0, ease: 'power2.in' },
+        0.70
+      )
+      .to(bg,
+        { scale: 1.06, y: '-6vh', ease: 'power2.in' },
+        0.70
+      )
+      .to(fab,
+        { x: '12vw', opacity: 0, ease: 'power2.in' },
+        0.70
+      );
+    }, section);
+
+    return () => {
+      entranceTl.kill();
+      ctx.revert();
+    };
+  }, []);
+
+  return (
+    <section 
+      ref={sectionRef}
+      className="section-pinned"
+      style={{ zIndex: 10 }}
+    >
+      <div 
+        ref={bgRef}
+        className="absolute inset-0 w-full h-full"
+        style={{
+          backgroundImage: 'url(/hero_dome_stars.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 60%',
+        }}
+      />
+      <div className="vignette-overlay absolute inset-0" />
+      
+      <div className="absolute left-[7vw] top-[58vh] w-[62vw] max-w-4xl">
+        <span 
+          ref={labelRef}
+          className="text-micro text-gold block mb-4 will-change-transform"
+        >
+          {t('hero.label')}
+        </span>
+        <h1 
+          ref={headlineRef}
+          className="text-display text-ivory text-[clamp(44px,5.2vw,84px)] mb-6 will-change-transform"
+        >
+          {t('hero.title')}
+        </h1>
+        <p 
+          ref={subheadRef}
+          className="text-slate text-[clamp(14px,1.2vw,18px)] leading-relaxed max-w-xl will-change-transform"
+        >
+          {t('hero.subtitle')}
+        </p>
+      </div>
+      
+      <button
+        ref={fabRef}
+        onClick={onBookClick}
+        className="fab-button absolute right-[4vw] bottom-[5vh] will-change-transform"
+      >
+        <span className="text-gold text-xs font-semibold uppercase tracking-wider">{t('hero.cta')}</span>
+      </button>
+    </section>
+  );
+};
+
+// Navigation Component
+const Navigation = ({ onAdminClick }: { onAdminClick: () => void }) => {
+  const [scrolled, setScrolled] = useState(false);
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 100);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <nav 
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        scrolled ? 'bg-[#0B0F17]/90 backdrop-blur-md py-4' : 'py-6'
+      }`}
+    >
+      <div className="flex items-center justify-between px-[4vw]">
+        <span className="text-micro text-ivory tracking-[0.18em]">
+          {CONFIG.business.name.toUpperCase()}
+        </span>
+        <div className="hidden md:flex items-center gap-8">
+          <button 
+            onClick={() => scrollToSection('accommodation')}
+            className="text-micro text-slate hover:text-ivory transition-colors"
+          >
+            {t('nav.accommodation')}
+          </button>
+          <button 
+            onClick={() => scrollToSection('activities')}
+            className="text-micro text-slate hover:text-ivory transition-colors"
+          >
+            {t('nav.activities')}
+          </button>
+          <button 
+            onClick={() => scrollToSection('contact')}
+            className="text-micro text-slate hover:text-ivory transition-colors"
+          >
+            {t('nav.contact')}
+          </button>
+          <LanguageSwitcher />
+          <button 
+            onClick={onAdminClick}
+            className="text-micro text-slate hover:text-gold transition-colors"
+          >
+            <Lock className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+// Testimonials Section
+const TestimonialsSection = ({ onBookClick }: { onBookClick: () => void }) => {
+  const { t } = useTranslation();
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const cardsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    const title = titleRef.current;
+    const cards = cardsRef.current;
+
+    if (!section || !title || !cards) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(title,
+        { y: 24, opacity: 0 },
+        {
+          y: 0, opacity: 1,
+          scrollTrigger: {
+            trigger: section,
+            start: 'top 80%',
+            end: 'top 55%',
+            scrub: true
+          }
+        }
+      );
+
+      const cardElements = cards.querySelectorAll('.testimonial-card');
+      gsap.fromTo(cardElements,
+        { y: 40, opacity: 0 },
+        {
+          y: 0, opacity: 1, stagger: 0.1,
+          scrollTrigger: {
+            trigger: cards,
+            start: 'top 70%',
+            end: 'top 40%',
+            scrub: true
+          }
+        }
+      );
+    }, section);
+
+    return () => ctx.revert();
+  }, []);
+
+  const testimonials = [
+    { text: 'Nerealu žiūrėti į žvaigždes gulint šiltoje lovoje.', author: 'Greta & Tomas' },
+    { text: 'Planetariumo seansas vidurnaktį—magija.', author: 'Eglė' },
+    { text: 'Ramybė, kurią sunkiai randi kitur.', author: 'Mantas' }
+  ];
+
+  return (
+    <section 
+      ref={sectionRef}
+      id="testimonials"
+      className="bg-secondary-navy py-[10vh] px-6"
+      style={{ zIndex: 110 }}
+    >
+      <div className="max-w-[980px] mx-auto">
+        <h2 
+          ref={titleRef}
+          className="text-display text-ivory text-[clamp(28px,3.5vw,48px)] text-center mb-12 will-change-transform"
+        >
+          {t('testimonials.title')}
+        </h2>
+        
+        <div ref={cardsRef} className="grid md:grid-cols-3 gap-6">
+          {testimonials.map((item, i) => (
+            <div 
+              key={i}
+              className="testimonial-card bg-[#0B0F17]/60 backdrop-blur-sm rounded-lg p-6 border border-white/5 will-change-transform"
+            >
+              <Star className="w-5 h-5 text-gold mb-4" />
+              <p className="text-ivory text-lg mb-4 leading-relaxed">"{item.text}"</p>
+              <p className="text-slate text-sm">— {item.author}</p>
+            </div>
+          ))}
+        </div>
+        
+        <div className="text-center mt-10">
+          <Button 
+            onClick={onBookClick}
+            className="bg-gold text-[#0B0F17] hover:bg-gold/90 px-8 py-3 rounded-full font-semibold"
+          >
+            {t('footer.cta')}
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// Activities Section
+const ActivitiesSection = () => {
+  const { t, i18n } = useTranslation();
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const ctx = gsap.context(() => {
+      const items = section.querySelectorAll('.activity-item');
+      gsap.fromTo(items,
+        { y: 30, opacity: 0 },
+        {
+          y: 0, opacity: 1, stagger: 0.1,
+          scrollTrigger: {
+            trigger: section,
+            start: 'top 70%',
+            end: 'top 40%',
+            scrub: true
+          }
+        }
+      );
+    }, section);
+
+    return () => ctx.revert();
+  }, []);
+
+  const getActivityName = (activity: typeof CONFIG.activities[0]) => {
+    if (i18n.language === 'en') return activity.nameEn;
+    if (i18n.language === 'ru') return activity.nameRu;
+    return activity.name;
+  };
+
+  const getActivityDesc = (activity: typeof CONFIG.activities[0]) => {
+    if (i18n.language === 'en') return activity.descriptionEn;
+    if (i18n.language === 'ru') return activity.descriptionRu;
+    return activity.description;
+  };
+
+  const getActivityDuration = (activity: typeof CONFIG.activities[0]) => {
+    if (i18n.language === 'en') return activity.durationEn;
+    if (i18n.language === 'ru') return activity.durationRu;
+    return activity.duration;
+  };
+
+  const iconMap: Record<string, React.ElementType> = {
+    Star, Flame, Droplets, Utensils
+  };
+
+  return (
+    <section 
+      ref={sectionRef}
+      id="activities"
+      className="bg-primary-navy py-[10vh] px-6"
+      style={{ zIndex: 105 }}
+    >
+      <div className="max-w-[1200px] mx-auto">
+        <h2 className="text-display text-ivory text-[clamp(28px,3.5vw,48px)] text-center mb-4">
+          {t('activities.title')}
+        </h2>
+        <p className="text-slate text-center mb-12 max-w-xl mx-auto">
+          {t('activities.subtitle')}
+        </p>
+        
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {CONFIG.activities.map((activity, i) => {
+            const Icon = iconMap[activity.icon] || Star;
+            return (
+              <div 
+                key={i}
+                className="activity-item group bg-[#141B24] rounded-lg p-6 border border-white/5 hover:border-gold/30 transition-all will-change-transform"
+              >
+                <Icon className="w-8 h-8 text-gold mb-4 group-hover:scale-110 transition-transform" />
+                <h3 className="text-ivory font-semibold text-lg mb-2">{getActivityName(activity)}</h3>
+                <p className="text-slate text-sm mb-4">{getActivityDesc(activity)}</p>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gold font-semibold">{activity.price} €</span>
+                  <span className="text-slate">{getActivityDuration(activity)}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// Accommodation Section
+const AccommodationSection = ({ onBookClick }: { onBookClick: (id: string) => void }) => {
+  const { t, i18n } = useTranslation();
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const ctx = gsap.context(() => {
+      const cards = section.querySelectorAll('.accommodation-card');
+      gsap.fromTo(cards,
+        { y: 40, opacity: 0 },
+        {
+          y: 0, opacity: 1, stagger: 0.15,
+          scrollTrigger: {
+            trigger: section,
+            start: 'top 70%',
+            end: 'top 30%',
+            scrub: true
+          }
+        }
+      );
+    }, section);
+
+    return () => ctx.revert();
+  }, []);
+
+  const getAccName = (acc: typeof CONFIG.accommodations[0]) => {
+    if (i18n.language === 'en') return acc.nameEn;
+    if (i18n.language === 'ru') return acc.nameRu;
+    return acc.name;
+  };
+
+  const getAccDesc = (acc: typeof CONFIG.accommodations[0]) => {
+    if (i18n.language === 'en') return acc.descriptionEn;
+    if (i18n.language === 'ru') return acc.descriptionRu;
+    return acc.description;
+  };
+
+  const getAccFeatures = (acc: typeof CONFIG.accommodations[0]) => {
+    if (i18n.language === 'en') return acc.featuresEn;
+    if (i18n.language === 'ru') return acc.featuresRu;
+    return acc.features;
+  };
+
+  return (
+    <section 
+      ref={sectionRef}
+      id="accommodation"
+      className="bg-primary-navy py-[10vh] px-6"
+      style={{ zIndex: 100 }}
+    >
+      <div className="max-w-[1200px] mx-auto">
+        <h2 className="text-display text-ivory text-[clamp(28px,3.5vw,48px)] text-center mb-4">
+          {t('accommodation.title')}
+        </h2>
+        <p className="text-slate text-center mb-12 max-w-xl mx-auto">
+          {t('accommodation.subtitle')}
+        </p>
+        
+        <div className="grid md:grid-cols-2 gap-6">
+          {CONFIG.accommodations.map((acc, i) => (
+            <div 
+              key={i}
+              className="accommodation-card bg-[#141B24] rounded-lg overflow-hidden border border-white/5 hover:border-gold/30 transition-all will-change-transform group"
+            >
+              <div className="h-48 overflow-hidden">
+                <img 
+                  src={acc.image} 
+                  alt={getAccName(acc)}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="text-ivory font-bold text-xl mb-2">{getAccName(acc)}</h3>
+                <p className="text-slate text-sm mb-4">{getAccDesc(acc)}</p>
+                <div className="flex items-center gap-4 mb-4 text-sm">
+                  <span className="text-gold flex items-center gap-1">
+                    <Users className="w-4 h-4" /> {t('accommodation.capacity', { count: acc.capacity })}
+                  </span>
+                  <span className="text-ivory font-semibold">
+                    {t('accommodation.perNight')}: {acc.priceLowSeason}-{acc.priceHighSeason} €
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {getAccFeatures(acc).slice(0, 4).map((feature, fi) => (
+                    <span key={fi} className="text-xs bg-[#0B0F17] text-slate px-2 py-1 rounded">
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+                <Button 
+                  onClick={() => onBookClick(acc.id)}
+                  className="w-full bg-gold text-[#0B0F17] hover:bg-gold/90"
+                >
+                  {t('accommodation.bookNow')}
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// Footer Section with Google Maps
+const FooterSection = ({ onBookClick }: { onBookClick: () => void }) => {
+  const { t } = useTranslation();
+
+  return (
+    <footer 
+      id="contact"
+      className="bg-secondary-navy relative py-[10vh] px-6"
+      style={{ zIndex: 120 }}
+    >
+      <div 
+        className="absolute inset-0 opacity-10"
+        style={{
+          backgroundImage: 'url(/footer_stars.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      />
+      
+      <div className="relative max-w-[1200px] mx-auto">
+        <div className="grid md:grid-cols-2 gap-12 items-start">
+          {/* Contact Info */}
+          <div>
+            <h2 className="text-display text-ivory text-[clamp(28px,3.5vw,48px)] mb-8">
+              {t('footer.title')}
+            </h2>
+            
+            <div className="space-y-4 mb-10">
+              <p className="text-slate flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-gold" />
+                {CONFIG.business.address}
+              </p>
+              <p className="text-slate flex items-center gap-2">
+                <Mail className="w-5 h-5 text-gold" />
+                {CONFIG.business.email}
+              </p>
+              <p className="text-slate flex items-center gap-2">
+                <Phone className="w-5 h-5 text-gold" />
+                {CONFIG.business.phoneDisplay}
+              </p>
+            </div>
+            
+            <Button 
+              onClick={onBookClick}
+              className="bg-gold text-[#0B0F17] hover:bg-gold/90 px-10 py-4 rounded-full font-semibold text-lg mb-6"
+            >
+              {t('footer.cta')}
+            </Button>
+
+            {CONFIG.bookingCom.enabled && (
+              <div className="mt-6">
+                <p className="text-slate text-sm mb-2">{t('booking.alsoOn')}</p>
+                <a 
+                  href={CONFIG.bookingCom.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-gold hover:underline"
+                >
+                  Booking.com <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
+            )}
+            
+            <div className="flex gap-6 text-sm mt-8">
+              <a href="#" className="text-slate hover:text-ivory transition-colors">{t('footer.rules')}</a>
+              <a href="#" className="text-slate hover:text-ivory transition-colors">{t('footer.privacy')}</a>
+            </div>
+          </div>
+
+          {/* Google Maps */}
+          <div className="rounded-lg overflow-hidden border border-white/10 h-[300px] md:h-full min-h-[300px]">
+            <iframe
+              src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2234.5!2d${CONFIG.business.coordinates.lng}!3d${CONFIG.business.coordinates.lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46e6e700415b8fa1%3A0xa1de19596e0d445e!2sZvaigzdziu%20Namai!5e0!3m2!1sen!2slt!4v1709577600000!5m2!1sen!2slt`}
+              width="100%"
+              height="100%"
+              style={{ border: 0, filter: 'grayscale(30%) brightness(0.8)' }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Location"
+            />
+          </div>
+        </div>
+        
+        <p className="text-slate/50 text-xs mt-10 text-center">
+          {t('footer.copyright')}
+        </p>
+      </div>
+    </footer>
+  );
+};
+
+// Booking Modal
+const BookingModal = ({ 
+  isOpen, 
+  onClose,
+  preselectedAccommodation
+}: { 
+  isOpen: boolean; 
+  onClose: () => void;
+  preselectedAccommodation?: string;
+}) => {
+  const { t, i18n } = useTranslation();
+  const [step, setStep] = useState(1);
+  const [bookingData, setBookingData] = useState<BookingData>({
+    accommodationId: preselectedAccommodation || CONFIG.accommodations[0].id,
+    checkIn: undefined,
+    checkOut: undefined,
+    guests: 2,
+    name: '',
+    email: '',
+    phone: '',
+    paymentMethod: 'card',
+    activities: []
+  });
+
+  const selectedAcc = CONFIG.accommodations.find(a => a.id === bookingData.accommodationId);
+  const nights = bookingData.checkIn && bookingData.checkOut 
+    ? Math.ceil((bookingData.checkOut.getTime() - bookingData.checkIn.getTime()) / (1000 * 60 * 60 * 24))
+    : 0;
+  const totalPrice = selectedAcc && nights > 0 
+    ? getCurrentPrice(selectedAcc.id, bookingData.checkIn) * nights
+    : 0;
+
+  const handleSubmit = () => {
+    setStep(4);
+    setTimeout(() => {
+      onClose();
+      setStep(1);
+      setBookingData({
+        accommodationId: CONFIG.accommodations[0].id,
+        checkIn: undefined,
+        checkOut: undefined,
+        guests: 2,
+        name: '',
+        email: '',
+        phone: '',
+        paymentMethod: 'card',
+        activities: []
+      });
+    }, 2000);
+  };
+
+  const toggleActivity = (activityId: string) => {
+    setBookingData(prev => ({
+      ...prev,
+      activities: prev.activities.includes(activityId)
+        ? prev.activities.filter(id => id !== activityId)
+        : [...prev.activities, activityId]
+    }));
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="bg-[#141B24] border-white/10 text-ivory max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-display text-xl text-ivory">
+            {t('booking.title')} - {t(`booking.step${step}`)}
+          </DialogTitle>
+        </DialogHeader>
+
+        {step === 1 && (
+          <div className="space-y-6">
+            <div>
+              <Label className="text-slate mb-2 block">{t('nav.accommodation')}</Label>
+              <Select 
+                value={bookingData.accommodationId} 
+                onValueChange={(v) => setBookingData({ ...bookingData, accommodationId: v })}
+              >
+                <SelectTrigger className="bg-[#0B0F17] border-white/10">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-[#0B0F17] border-white/10">
+                  {CONFIG.accommodations.map(acc => (
+                    <SelectItem key={acc.id} value={acc.id}>
+                      {i18n.language === 'en' ? acc.nameEn : i18n.language === 'ru' ? acc.nameRu : acc.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-slate mb-2 block">{t('booking.checkIn')}</Label>
+                <CalendarComponent
+                  mode="single"
+                  selected={bookingData.checkIn}
+                  onSelect={(date) => setBookingData({ ...bookingData, checkIn: date })}
+                  className="bg-[#0B0F17] rounded-lg border border-white/10"
+                  disabled={(date) => date < new Date()}
+                />
+              </div>
+              <div>
+                <Label className="text-slate mb-2 block">{t('booking.checkOut')}</Label>
+                <CalendarComponent
+                  mode="single"
+                  selected={bookingData.checkOut}
+                  onSelect={(date) => setBookingData({ ...bookingData, checkOut: date })}
+                  className="bg-[#0B0F17] rounded-lg border border-white/10"
+                  disabled={(date) => date < (bookingData.checkIn || new Date())}
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-slate mb-2 block">{t('booking.guests')}</Label>
+              <Select 
+                value={bookingData.guests.toString()} 
+                onValueChange={(v) => setBookingData({ ...bookingData, guests: parseInt(v) })}
+              >
+                <SelectTrigger className="bg-[#0B0F17] border-white/10">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-[#0B0F17] border-white/10">
+                  {[1,2,3,4].map(n => (
+                    <SelectItem key={n} value={n.toString()}>
+                      {n} {n === 1 ? t('booking.person') : t('booking.people')}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {nights > 0 && (
+              <div className="bg-[#0B0F17] rounded-lg p-4">
+                <p className="text-slate text-sm">{nights} {t('booking.nights')} × {getCurrentPrice(bookingData.accommodationId, bookingData.checkIn)} €</p>
+                <p className="text-gold font-bold text-lg">{t('booking.total')}: {totalPrice} €</p>
+              </div>
+            )}
+
+            <Button 
+              onClick={() => setStep(2)}
+              disabled={!bookingData.checkIn || !bookingData.checkOut}
+              className="w-full bg-gold text-[#0B0F17] hover:bg-gold/90"
+            >
+              {t('booking.next')} <ChevronRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className="space-y-4">
+            <div>
+              <Label className="text-slate mb-2 block">{t('booking.name')}</Label>
+              <Input 
+                value={bookingData.name}
+                onChange={(e) => setBookingData({ ...bookingData, name: e.target.value })}
+                className="bg-[#0B0F17] border-white/10"
+                placeholder="Jonas Jonaitis"
+              />
+            </div>
+            <div>
+              <Label className="text-slate mb-2 block">{t('booking.email')}</Label>
+              <Input 
+                type="email"
+                value={bookingData.email}
+                onChange={(e) => setBookingData({ ...bookingData, email: e.target.value })}
+                className="bg-[#0B0F17] border-white/10"
+                placeholder="jonas@pastas.lt"
+              />
+            </div>
+            <div>
+              <Label className="text-slate mb-2 block">{t('booking.phone')}</Label>
+              <Input 
+                type="tel"
+                value={bookingData.phone}
+                onChange={(e) => setBookingData({ ...bookingData, phone: e.target.value })}
+                className="bg-[#0B0F17] border-white/10"
+                placeholder="+370 600 00000"
+              />
+            </div>
+            <div>
+              <Label className="text-slate mb-2 block">{t('booking.paymentMethod')}</Label>
+              <Select 
+                value={bookingData.paymentMethod} 
+                onValueChange={(v) => setBookingData({ ...bookingData, paymentMethod: v })}
+              >
+                <SelectTrigger className="bg-[#0B0F17] border-white/10">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-[#0B0F17] border-white/10">
+                  {CONFIG.paymentMethods.map(pm => (
+                    <SelectItem key={pm.id} value={pm.id}>
+                      {i18n.language === 'en' ? pm.nameEn : i18n.language === 'ru' ? pm.nameRu : pm.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label className="text-slate mb-2 block">{t('nav.activities')} ({t('common.optional')})</Label>
+              <div className="space-y-2">
+                {CONFIG.activities.map(activity => (
+                  <label key={activity.id} className="flex items-center gap-3 p-3 bg-[#0B0F17] rounded-lg cursor-pointer hover:bg-white/5 transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={bookingData.activities.includes(activity.id)}
+                      onChange={() => toggleActivity(activity.id)}
+                      className="w-4 h-4 accent-gold"
+                    />
+                    <span className="text-ivory text-sm flex-1">
+                      {i18n.language === 'en' ? activity.nameEn : i18n.language === 'ru' ? activity.nameRu : activity.name}
+                    </span>
+                    <span className="text-gold text-sm">+{activity.price} €</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <Button 
+                onClick={() => setStep(1)}
+                variant="outline"
+                className="flex-1 border-white/10"
+              >
+                {t('booking.back')}
+              </Button>
+              <Button 
+                onClick={() => setStep(3)}
+                disabled={!bookingData.name || !bookingData.email}
+                className="flex-1 bg-gold text-[#0B0F17] hover:bg-gold/90"
+              >
+                {t('booking.next')}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="space-y-4">
+            <div className="bg-[#0B0F17] rounded-lg p-4 space-y-2">
+              <div className="flex justify-between">
+                <span className="text-slate">{t('nav.accommodation')}:</span>
+                <span className="text-ivory">
+                  {selectedAcc && (i18n.language === 'en' ? selectedAcc.nameEn : i18n.language === 'ru' ? selectedAcc.nameRu : selectedAcc.name)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate">{t('booking.checkIn')}:</span>
+                <span className="text-ivory">{bookingData.checkIn?.toLocaleDateString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate">{t('booking.checkOut')}:</span>
+                <span className="text-ivory">{bookingData.checkOut?.toLocaleDateString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate">{t('booking.guests')}:</span>
+                <span className="text-ivory">{bookingData.guests}</span>
+              </div>
+              {bookingData.activities.length > 0 && (
+                <div className="border-t border-white/10 pt-2 mt-2">
+                  <span className="text-slate block mb-1">{t('nav.activities')}:</span>
+                  {bookingData.activities.map(actId => {
+                    const act = CONFIG.activities.find(a => a.id === actId);
+                    return act ? (
+                      <span key={actId} className="text-ivory text-sm block">
+                        + {i18n.language === 'en' ? act.nameEn : i18n.language === 'ru' ? act.nameRu : act.name}
+                      </span>
+                    ) : null;
+                  })}
+                </div>
+              )}
+              <div className="border-t border-white/10 pt-2 mt-2">
+                <div className="flex justify-between">
+                  <span className="text-slate">{t('booking.total')}:</span>
+                  <span className="text-gold font-bold text-lg">
+                    {totalPrice + bookingData.activities.reduce((sum, actId) => {
+                      const act = CONFIG.activities.find(a => a.id === actId);
+                      return sum + (act?.price || 0);
+                    }, 0)} €
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <Button 
+                onClick={() => setStep(2)}
+                variant="outline"
+                className="flex-1 border-white/10"
+              >
+                {t('booking.back')}
+              </Button>
+              <Button 
+                onClick={handleSubmit}
+                className="flex-1 bg-gold text-[#0B0F17] hover:bg-gold/90"
+              >
+                {t('booking.confirm')}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div className="text-center py-8">
+            <div className="w-16 h-16 bg-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Check className="w-8 h-8 text-gold" />
+            </div>
+            <p className="text-ivory text-lg mb-2">{t('booking.success')}</p>
+            <p className="text-slate">{t('booking.successMessage', { email: bookingData.email })}</p>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Admin Dashboard Modal
+const AdminModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  const { t, i18n } = useTranslation();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [password, setPassword] = useState('');
+  const [activeTab, setActiveTab] = useState('prices');
+  const [config, setConfig] = useState(CONFIG);
+
+  const handleLogin = () => {
+    if (password === CONFIG.admin.password) {
+      setIsLoggedIn(true);
+    }
+  };
+
+  const updateAccommodationPrice = (id: string, field: string, value: number) => {
+    setConfig(prev => ({
+      ...prev,
+      accommodations: prev.accommodations.map(acc => 
+        acc.id === id ? { ...acc, [field]: value } : acc
+      )
+    }));
+  };
+
+  const updateActivityPrice = (id: string, value: number) => {
+    setConfig(prev => ({
+      ...prev,
+      activities: prev.activities.map(act => 
+        act.id === id ? { ...act, price: value } : act
+      )
+    }));
+  };
+
+  if (!isLoggedIn) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="bg-[#141B24] border-white/10 text-ivory max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-display text-xl text-ivory">{t('admin.login')}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-slate mb-2 block">{t('admin.password')}</Label>
+              <Input 
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="bg-[#0B0F17] border-white/10"
+                onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+              />
+            </div>
+            <Button 
+              onClick={handleLogin}
+              className="w-full bg-gold text-[#0B0F17] hover:bg-gold/90"
+            >
+              {t('admin.login')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="bg-[#141B24] border-white/10 text-ivory max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-display text-xl text-ivory flex items-center justify-between">
+            {t('admin.title')}
+            <Button onClick={() => { setIsLoggedIn(false); onClose(); }} variant="outline" size="sm" className="border-white/10">
+              {t('admin.logout')}
+            </Button>
+          </DialogTitle>
+        </DialogHeader>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="bg-[#0B0F17] border border-white/10">
+            <TabsTrigger value="prices" className="data-[state=active]:bg-gold data-[state=active]:text-[#0B0F17]">
+              <Settings className="w-4 h-4 mr-2" /> {t('admin.prices')}
+            </TabsTrigger>
+            <TabsTrigger value="activities" className="data-[state=active]:bg-gold data-[state=active]:text-[#0B0F17]">
+              <Edit3 className="w-4 h-4 mr-2" /> {t('admin.activities')}
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="prices" className="space-y-6">
+            <h3 className="text-lg font-semibold text-ivory">{t('accommodation.title')}</h3>
+            {config.accommodations.map(acc => (
+              <div key={acc.id} className="bg-[#0B0F17] rounded-lg p-4 space-y-3">
+                <h4 className="text-ivory font-medium">
+                  {i18n.language === 'en' ? acc.nameEn : i18n.language === 'ru' ? acc.nameRu : acc.name}
+                </h4>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Label className="text-slate text-xs">Žemasis sezonas</Label>
+                    <Input 
+                      type="number"
+                      value={acc.priceLowSeason}
+                      onChange={(e) => updateAccommodationPrice(acc.id, 'priceLowSeason', parseInt(e.target.value))}
+                      className="bg-[#141B24] border-white/10 mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-slate text-xs">Aukštasis sezonas</Label>
+                    <Input 
+                      type="number"
+                      value={acc.priceHighSeason}
+                      onChange={(e) => updateAccommodationPrice(acc.id, 'priceHighSeason', parseInt(e.target.value))}
+                      className="bg-[#141B24] border-white/10 mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-slate text-xs">Savaitgalis</Label>
+                    <Input 
+                      type="number"
+                      value={acc.priceWeekend}
+                      onChange={(e) => updateAccommodationPrice(acc.id, 'priceWeekend', parseInt(e.target.value))}
+                      className="bg-[#141B24] border-white/10 mt-1"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+            <Button 
+              onClick={() => alert('Išsaugota! (Demo)')}
+              className="w-full bg-gold text-[#0B0F17] hover:bg-gold/90"
+            >
+              {t('admin.save')}
+            </Button>
+          </TabsContent>
+
+          <TabsContent value="activities" className="space-y-4">
+            <h3 className="text-lg font-semibold text-ivory">{t('activities.title')}</h3>
+            {config.activities.map(act => (
+              <div key={act.id} className="bg-[#0B0F17] rounded-lg p-4 flex items-center justify-between">
+                <div>
+                  <h4 className="text-ivory font-medium">
+                    {i18n.language === 'en' ? act.nameEn : i18n.language === 'ru' ? act.nameRu : act.name}
+                  </h4>
+                  <p className="text-slate text-sm">{act.duration}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Input 
+                    type="number"
+                    value={act.price}
+                    onChange={(e) => updateActivityPrice(act.id, parseInt(e.target.value))}
+                    className="bg-[#141B24] border-white/10 w-24"
+                  />
+                  <span className="text-slate">€</span>
+                </div>
+              </div>
+            ))}
+            <Button 
+              onClick={() => alert('Išsaugota! (Demo)')}
+              className="w-full bg-gold text-[#0B0F17] hover:bg-gold/90"
+            >
+              {t('admin.save')}
+            </Button>
+          </TabsContent>
+        </Tabs>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Main App
+function App() {
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [preselectedAccommodation, setPreselectedAccommodation] = useState<string | undefined>();
+  const { t } = useTranslation();
+  const mainRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const setupSnap = () => {
+      const pinned = ScrollTrigger.getAll()
+        .filter(st => st.vars.pin)
+        .sort((a, b) => a.start - b.start);
+      
+      const maxScroll = ScrollTrigger.maxScroll(window);
+      if (!maxScroll || pinned.length === 0) return;
+
+      const pinnedRanges = pinned.map(st => ({
+        start: st.start / maxScroll,
+        end: (st.end ?? st.start) / maxScroll,
+        center: (st.start + ((st.end ?? st.start) - st.start) * 0.5) / maxScroll,
+      }));
+
+      ScrollTrigger.create({
+        snap: {
+          snapTo: (value: number) => {
+            const inPinned = pinnedRanges.some(r => value >= r.start - 0.02 && value <= r.end + 0.02);
+            if (!inPinned) return value;
+            
+            const target = pinnedRanges.reduce((closest, r) =>
+              Math.abs(r.center - value) < Math.abs(closest - value) ? r.center : closest,
+              pinnedRanges[0]?.center ?? 0
+            );
+            return target;
+          },
+          duration: { min: 0.15, max: 0.35 },
+          delay: 0,
+          ease: 'power2.out'
+        }
+      });
+    };
+
+    const timer = setTimeout(setupSnap, 500);
+    
+    return () => {
+      clearTimeout(timer);
+      ScrollTrigger.getAll().forEach(st => st.kill());
+    };
+  }, []);
+
+  const openBooking = (accommodationId?: string) => {
+    setPreselectedAccommodation(accommodationId);
+    setIsBookingOpen(true);
+  };
+
+  return (
+    <div ref={mainRef} className="relative bg-primary-navy">
+      <div className="grain-overlay" />
+      
+      <Navigation onAdminClick={() => setIsAdminOpen(true)} />
+      
+      <HeroSection onBookClick={() => openBooking()} />
+      
+      <PinnedSection
+        id="what"
+        backgroundImage="/what_dome_sky.jpg"
+        headline={t('sections.what.title')}
+        body={t('sections.what.body')}
+        fabLabel={t('sections.what.cta')}
+        onFabClick={() => openBooking()}
+        zIndex={20}
+      />
+      
+      <PinnedSection
+        id="where"
+        backgroundImage="/where_lake_shore.jpg"
+        headline={t('sections.where.title')}
+        body={t('sections.where.body')}
+        fabLabel={t('sections.where.cta')}
+        onFabClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+        zIndex={30}
+      />
+      
+      <PinnedSection
+        id="why"
+        backgroundImage="/why_dome_interior.jpg"
+        headline={t('sections.why.title')}
+        body={t('sections.why.body')}
+        fabLabel={t('sections.why.cta')}
+        onFabClick={() => document.getElementById('activities')?.scrollIntoView({ behavior: 'smooth' })}
+        zIndex={40}
+      />
+      
+      <PinnedSection
+        id="for-whom"
+        backgroundImage="/for_whom_couple_lake.jpg"
+        headline={t('sections.forWhom.title')}
+        body={t('sections.forWhom.body')}
+        fabLabel={t('sections.forWhom.cta')}
+        onFabClick={() => openBooking()}
+        zIndex={50}
+      />
+      
+      <PinnedSection
+        id="amenities"
+        backgroundImage="/amenities_dome_interior.jpg"
+        headline={t('sections.amenities.title')}
+        body={t('sections.amenities.body')}
+        fabLabel={t('sections.amenities.cta')}
+        onFabClick={() => document.getElementById('accommodation')?.scrollIntoView({ behavior: 'smooth' })}
+        zIndex={60}
+      />
+      
+      <PinnedSection
+        id="pricing"
+        backgroundImage="/pricing_dome_night.jpg"
+        headline={t('sections.pricing.title', { price: 100 })}
+        body={t('sections.pricing.body')}
+        fabLabel={t('sections.pricing.cta')}
+        onFabClick={() => openBooking()}
+        zIndex={70}
+      />
+      
+      <PinnedSection
+        id="availability"
+        backgroundImage="/availability_starry_sky.jpg"
+        headline={t('sections.availability.title')}
+        body={t('sections.availability.body')}
+        fabLabel={t('sections.availability.cta')}
+        onFabClick={() => openBooking()}
+        zIndex={80}
+      />
+      
+      <PinnedSection
+        id="booking-cta"
+        backgroundImage="/booking_dome_dusk.jpg"
+        headline={t('sections.booking.title')}
+        body={t('sections.booking.body')}
+        fabLabel={t('sections.booking.cta')}
+        onFabClick={() => openBooking()}
+        zIndex={90}
+      />
+      
+      <PinnedSection
+        id="planetarium"
+        backgroundImage="/planetarium_stars.jpg"
+        headline={t('sections.planetarium.title')}
+        body={t('sections.planetarium.body')}
+        fabLabel={t('sections.planetarium.cta')}
+        onFabClick={() => openBooking()}
+        zIndex={100}
+      />
+      
+      <AccommodationSection onBookClick={openBooking} />
+      <ActivitiesSection />
+      <TestimonialsSection onBookClick={() => openBooking()} />
+      <FooterSection onBookClick={() => openBooking()} />
+      
+      <BookingModal 
+        isOpen={isBookingOpen} 
+        onClose={() => setIsBookingOpen(false)}
+        preselectedAccommodation={preselectedAccommodation}
+      />
+      
+      <AdminModal isOpen={isAdminOpen} onClose={() => setIsAdminOpen(false)} />
+    </div>
+  );
+}
+
+export default App;

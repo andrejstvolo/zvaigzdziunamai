@@ -1,0 +1,167 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 216 35% 7%;
+    --foreground: 40 30% 94%;
+    --card: 216 25% 11%;
+    --card-foreground: 40 30% 94%;
+    --popover: 216 25% 11%;
+    --popover-foreground: 40 30% 94%;
+    --primary: 40 60% 56%;
+    --primary-foreground: 216 35% 7%;
+    --secondary: 216 25% 11%;
+    --secondary-foreground: 40 30% 94%;
+    --muted: 216 20% 18%;
+    --muted-foreground: 213 20% 71%;
+    --accent: 40 60% 56%;
+    --accent-foreground: 216 35% 7%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 216 20% 20%;
+    --input: 216 20% 20%;
+    --ring: 40 60% 56%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+  }
+}
+
+@layer components {
+  .text-display {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    line-height: 0.95;
+  }
+  
+  .text-micro {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+  }
+  
+  .vignette-overlay {
+    background: radial-gradient(ellipse at center, transparent 0%, transparent 40%, rgba(0,0,0,0.55) 100%);
+    pointer-events: none;
+  }
+  
+  .grain-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.06;
+    mix-blend-mode: overlay;
+    z-index: 9999;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+  
+  .fab-button {
+    @apply w-[72px] h-[72px] rounded-full flex items-center justify-center;
+    background: rgba(11, 15, 23, 0.72);
+    border: 2px solid #D4A24A;
+    backdrop-filter: blur(10px);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .fab-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(212, 162, 74, 0.3);
+  }
+  
+  .fab-button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(212, 162, 74, 0.15), transparent 60%);
+    pointer-events: none;
+  }
+  
+  .section-pinned {
+    @apply w-screen h-screen overflow-hidden relative;
+  }
+  
+  .bg-primary-navy {
+    background-color: #0B0F17;
+  }
+  
+  .bg-secondary-navy {
+    background-color: #141B24;
+  }
+  
+  .text-gold {
+    color: #D4A24A;
+  }
+  
+  .text-ivory {
+    color: #F3EFE6;
+  }
+  
+  .text-slate {
+    color: #A9B3C2;
+  }
+  
+  .border-gold {
+    border-color: #D4A24A;
+  }
+}
+
+@layer utilities {
+  .will-change-transform {
+    will-change: transform;
+  }
+  
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+}
+
+/* Smooth scrolling for Lenis */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}

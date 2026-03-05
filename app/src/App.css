@@ -1,0 +1,103 @@
+/* Additional App Styles */
+
+/* Smooth section transitions */
+section {
+  position: relative;
+}
+
+/* Ensure pinned sections stack correctly */
+.section-pinned {
+  will-change: transform;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0B0F17;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1a2330;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #D4A24A;
+}
+
+/* Calendar custom styles */
+.rdp {
+  --rdp-accent-color: #D4A24A;
+  --rdp-background-color: #0B0F17;
+}
+
+.rdp-day_selected {
+  background-color: #D4A24A !important;
+  color: #0B0F17 !important;
+}
+
+.rdp-day:hover {
+  background-color: rgba(212, 162, 74, 0.2) !important;
+}
+
+/* Dialog overlay */
+[data-state="open"] > [data-radix-dialog-overlay] {
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+}
+
+/* Button hover effects */
+button {
+  transition: all 0.2s ease;
+}
+
+/* Focus states */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #D4A24A;
+  outline-offset: 2px;
+}
+
+/* Selection color */
+::selection {
+  background-color: rgba(212, 162, 74, 0.3);
+  color: #F3EFE6;
+}
+
+/* Image loading placeholder */
+img {
+  background-color: #141B24;
+}
+
+/* Prevent text selection on interactive elements */
+.fab-button,
+nav button {
+  user-select: none;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .fab-button {
+    width: 64px;
+    height: 64px;
+  }
+  
+  .text-display {
+    letter-spacing: 0.04em;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

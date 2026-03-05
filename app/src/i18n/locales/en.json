@@ -1,0 +1,89 @@
+{
+  "nav": {
+    "accommodation": "Accommodation",
+    "activities": "Activities",
+    "sports": "Sports",
+    "location": "How to get here",
+    "contact": "Contact",
+    "admin": "Admin"
+  },
+  "hero": {
+    "title": "Rest under the open sky",
+    "subtitle": "Unique glamping domes by Lake Mikytai. Planetarium shows, sauna, sports courts and unforgettable nature experience.",
+    "cta": "Book now",
+    "learnMore": "Learn more"
+  },
+  "accommodation": {
+    "title": "Our domes",
+    "subtitle": "4 unique glamping domes surrounded by nature. Currently 1 dome is open, others are being prepared.",
+    "status": "Now open: 1 dome | Coming soon: 3 domes",
+    "guests": "guests",
+    "perNight": "per night",
+    "book": "Book",
+    "features": "Amenities"
+  },
+  "activities": {
+    "title": "Activities and amenities",
+    "subtitle": "Everything you need for an unforgettable stay"
+  },
+  "sports": {
+    "badge": "Sports courts",
+    "title": "Beach sports courts",
+    "description": "Professional sand court for volleyball and handball. Perfect for sports schools, teams and groups of friends.",
+    "beachVolleyball": "Beach volleyball",
+    "beachVolleyballDesc": "Standard size court with net",
+    "beachHandball": "Beach handball",
+    "beachHandballDesc": "Sand court with goals",
+    "price": "Price",
+    "hour": "hour",
+    "schoolDiscount": "Sports schools",
+    "bookCourt": "Book court",
+    "location": "Mikytai, Sakiai district"
+  },
+  "location": {
+    "title": "How to get here",
+    "subtitle": "Star Houses are located by Lake Mikytai, Sakiai district",
+    "byCar": "By car from Kaunas",
+    "byCarDesc": "Via A1/E85 towards Marijampole, then road 138 towards Sakiai",
+    "gps": "GPS coordinates",
+    "address": "Address",
+    "openWaze": "Open in Waze"
+  },
+  "booking": {
+    "selectType": "Select booking type",
+    "accommodation": "Accommodation",
+    "accommodationDesc": "Dome reservation for overnight stay",
+    "sports": "Sports court",
+    "sportsDesc": "Volleyball/handball court rental",
+    "accommodationDetails": "Accommodation details",
+    "sportsDetails": "Sports court details",
+    "selectDome": "Select dome",
+    "selectCourt": "Select court",
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "date": "Date",
+    "startTime": "Start time",
+    "duration": "Duration",
+    "hours": "hours",
+    "name": "Full name",
+    "email": "Email",
+    "phone": "Phone",
+    "organization": "Organization / School (optional)",
+    "confirm": "Confirm booking",
+    "back": "Back",
+    "nights": "nights",
+    "schoolDiscount": "school discount",
+    "success": "Booking confirmed!",
+    "thankYou": "Thank you!",
+    "confirmationSent": "Confirmation sent to"
+  },
+  "footer": {
+    "description": "Unique glamping domes by Lake Mikytai. Planetarium, sauna, sports and nature tranquility in one place.",
+    "bookNow": "Book now",
+    "contact": "Contact",
+    "links": "Links",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "copyright": "© 2026 Star Houses. All rights reserved."
+  }
+}

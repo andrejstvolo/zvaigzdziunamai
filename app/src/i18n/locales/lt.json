@@ -1,0 +1,123 @@
+{
+  "nav": {
+    "accommodation": "Apgyvendinimas",
+    "activities": "Pramogos",
+    "sports": "Sportas",
+    "about": "Apie mus",
+    "gallery": "Galerija",
+    "faq": "DUK",
+    "location": "Kaip atvykti",
+    "contact": "Kontaktai",
+    "news": "Naujienos",
+    "login": "Prisijungti",
+    "admin": "Admin"
+  },
+  "auth": {
+    "login": "Prisijungti",
+    "register": "Registruotis",
+    "password": "Slaptažodis",
+    "noAccount": "Neturite paskyros?",
+    "hasAccount": "Jau turite paskyrą?"
+  },
+  "dashboard": {
+    "title": "Mano paskyra",
+    "bookings": "Mano užsakymai",
+    "orders": "Papildomos paslaugos",
+    "profile": "Profilis",
+    "manage": "Valdyti",
+    "addExtras": "Užsakyti papildomai",
+    "orderMeals": "Užsakyti maistą",
+    "noOrders": "Dar neturite užsakymų",
+    "logout": "Atsijungti"
+  },
+  "status": {
+    "pending": "Laukiama",
+    "confirmed": "Patvirtinta",
+    "paid": "Apmokėta",
+    "cancelled": "Atšaukta"
+  },
+  "news": {
+    "title": "Naujienos ir pasiūlymai",
+    "subtitle": "Sužinokite pirmieji apie naujoves ir specialius pasiūlymus",
+    "featured": "Svarbu"
+  },
+  "hero": {
+    "title": "Poilsis po atviru dangumi",
+    "subtitle": "Unikalūs glamping kupolai prie Mikytų ežero. Planetariumo seansai, pirtis, sporto aikštelės ir nepamirštama gamtos patirtis.",
+    "cta": "Užsakyti",
+    "learnMore": "Sužinoti daugiau"
+  },
+  "accommodation": {
+    "title": "Mūsų kupolai",
+    "subtitle": "4 unikalūs glamping kupolai gamtos apsuptyje. Dabar veikia 1 kupolas, kiti ruošiami.",
+    "status": "Dabar veikia: 1 kupolas | Ruosiama: 3 kupolai",
+    "guests": "asm.",
+    "perNight": "nakčiai",
+    "book": "Užsakyti",
+    "features": "Patogumai"
+  },
+  "activities": {
+    "title": "Pramogos ir patogumai",
+    "subtitle": "Viskas, ko reikia nepamirštamam poilsiui"
+  },
+  "sports": {
+    "badge": "Sporto aikštelės",
+    "title": "Paplūdimio sporto aikštelės",
+    "description": "Profesionali smėlio aikštelė tinkliniui ir rankiniui. Idealiai tinka sporto mokykloms, komandoms ir draugų kompanijoms.",
+    "beachVolleyball": "Paplūdimio tinklinis",
+    "beachVolleyballDesc": "Standartinės išmatavimų aikštelė su tinklu",
+    "beachHandball": "Paplūdimio rankinis",
+    "beachHandballDesc": "Smėlio aikštelė su vartais",
+    "price": "Kaina",
+    "hour": "val.",
+    "schoolDiscount": "Sporto mokykloms",
+    "bookCourt": "Užsakyti aikštelę",
+    "location": "Mikytų k., Šakių r."
+  },
+  "location": {
+    "title": "Kaip atvykti",
+    "subtitle": "Žvaigždžių Namai įsikūrę prie Mikytų ežero, Šakių rajone",
+    "byCar": "Automobiliu iš Kauno",
+    "byCarDesc": "Via A1/E85 link Marijampolės, tada kelias 138 link Šakių",
+    "gps": "GPS koordinatės",
+    "address": "Adresas",
+    "openWaze": "Atidaryti Waze"
+  },
+  "booking": {
+    "selectType": "Pasirinkite užsakymo tipą",
+    "accommodation": "Apgyvendinimas",
+    "accommodationDesc": "Kupolo rezervacija nakvynei",
+    "sports": "Sporto aikštelė",
+    "sportsDesc": "Tinklinio/rankinio aikštelės nuoma",
+    "accommodationDetails": "Apgyvendinimo detalės",
+    "sportsDetails": "Sporto aikštelės detalės",
+    "selectDome": "Pasirinkite kupolą",
+    "selectCourt": "Pasirinkite aikštelę",
+    "checkIn": "Atvykimas",
+    "checkOut": "Išvykimas",
+    "date": "Data",
+    "startTime": "Pradžios laikas",
+    "duration": "Trukmė",
+    "hours": "val.",
+    "name": "Vardas ir pavardė",
+    "email": "El. paštas",
+    "phone": "Telefonas",
+    "organization": "Organizacija / Mokykla (neprivaloma)",
+    "confirm": "Patvirtinti užsakymą",
+    "back": "Atgal",
+    "nights": "naktys",
+    "schoolDiscount": "mokyklinė nuolaida",
+    "success": "Užsakymas priimtas!",
+    "thankYou": "Ačiū!",
+    "confirmationSent": "Patvirtinimas išsiųstas į"
+  },
+  "footer": {
+    "description": "Unikalūs glamping kupolai prie Mikytų ežero. Planetariumas, pirtis, sportas ir gamtos ramybė vienoje vietoje.",
+    "bookNow": "Užsakyti dabar",
+    "contact": "Kontaktai",
+    "links": "Nuorodos",
+    "terms": "Taisyklės",
+    "privacy": "Privatumas",
+    "copyright": "© 2026 Žvaigždžių Namai. Visos teisės saugomos."
+  }
+}
