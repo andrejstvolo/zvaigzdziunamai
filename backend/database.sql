@@ -108,6 +108,47 @@ CREATE TABLE news (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Date-based pricing for accommodations (admin can set different prices per date)
+CREATE TABLE accommodation_prices (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  accommodation_id INT NOT NULL,
+  date DATE NOT NULL,
+  price DECIMAL(10,2) NOT NULL,
+  is_available BOOLEAN DEFAULT TRUE,
+  note VARCHAR(255),
+  created_by INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (accommodation_id) REFERENCES accommodations(id) ON DELETE CASCADE,
+  FOREIGN KEY (created_by) REFERENCES users(id),
+  UNIQUE KEY unique_date_accommodation (accommodation_id, date),
+  INDEX idx_date (date),
+  INDEX idx_accommodation_id (accommodation_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Seasons configuration (for automatic pricing)
+CREATE TABLE seasons (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  name_en VARCHAR(100),
+  name_ru VARCHAR(100),
+  start_month INT NOT NULL,
+  start_day INT NOT NULL,
+  end_month INT NOT NULL,
+  end_day INT NOT NULL,
+  price_multiplier DECIMAL(3,2) DEFAULT 1.00,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Insert default seasons
+INSERT INTO seasons (name, name_en, name_ru, start_month, start_day, end_month, end_day, price_multiplier) VALUES
+('Žemasis sezonas', 'Low season', 'Низкий сезон', 1, 1, 4, 30, 1.00),
+('Vidurinis sezonas', 'Mid season', 'Средний сезон', 5, 1, 6, 30, 1.20),
+('Aukštasis sezonas', 'High season', 'Высокий сезон', 7, 1, 8, 31, 1.50),
+('Rudens sezonas', 'Autumn season', 'Осенний сезон', 9, 1, 10, 31, 1.20),
+('Žiemos sezonas', 'Winter season', 'Зимний сезон', 11, 1, 12, 31, 1.00);
+
 -- Insert default accommodations
 INSERT INTO accommodations (name, name_en, name_ru, description, description_en, description_ru, capacity, price_low_season, price_high_season, price_weekend, image, features) VALUES
 ('Kupolas Nr. 1', 'Dome No. 1', 'Купол № 1', 

@@ -6,9 +6,8 @@ import {
   MapPin, Droplets, Star, 
   Globe, Menu, X, Calendar, Clock,
   Info, Tent, ChevronDown, ChevronUp,
-  User, LogOut, ShoppingBag, Users, TrendingUp, DollarSign,
-  Bell, Sun, Moon, Search, Download,
-  CheckCircle, Edit, Eye
+  User, LogOut, ShoppingBag,
+  Bell, Sun, Moon
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -19,6 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { CMS, getLocalized } from './cms';
 import { authAPI } from './api';
 import { BookingWizard } from './components/BookingWizard';
+import { AdminDashboard } from './components/AdminDashboard';
 import './i18n';
 import './App.css';
 
@@ -689,215 +689,6 @@ const GallerySection = () => {
   );
 };
 
-// Admin Panel Modal
-const AdminPanelModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
-  const { isDark } = useContext(ThemeContext);
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-
-  // Mock data for admin
-  const stats = {
-    totalBookings: 127,
-    pendingBookings: 8,
-    totalRevenue: 18450,
-    todayBookings: 3
-  };
-
-  const allBookings = [
-    { id: 'B001', customer: 'Jonas Jonaitis', email: 'jonas@email.lt', type: 'accommodation', item: 'Kupolas Nr. 1', checkIn: '2026-04-15', checkOut: '2026-04-17', total: 300, status: 'confirmed', payment: 'paid', createdAt: '2026-03-01' },
-    { id: 'B002', customer: 'Petras Petraitis', email: 'petras@email.lt', type: 'sports', item: 'Paplūdimio tinklinis', checkIn: '2026-03-20', checkOut: '-', total: 45, status: 'paid', payment: 'paid', createdAt: '2026-03-05' },
-    { id: 'B003', customer: 'Ona Onaitė', email: 'ona@email.lt', type: 'accommodation', item: 'Kupolas Nr. 2', checkIn: '2026-05-01', checkOut: '2026-05-03', total: 360, status: 'pending', payment: 'pending', createdAt: '2026-03-10' },
-    { id: 'B004', customer: 'Marija Marijauskienė', email: 'marija@email.lt', type: 'accommodation', item: 'Kupolas Nr. 1', checkIn: '2026-03-25', checkOut: '2026-03-26', total: 150, status: 'confirmed', payment: 'paid', createdAt: '2026-03-08' },
-    { id: 'B005', customer: 'Sporto mokykla "Žalgiris"', email: 'zalgiris@sportas.lt', type: 'sports', item: 'Paplūdimio rankinis', checkIn: '2026-03-28', checkOut: '-', total: 84, status: 'confirmed', payment: 'pending', createdAt: '2026-03-12' },
-  ];
-
-  const filteredBookings = allBookings.filter(b => {
-    const matchesSearch = b.customer.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                         b.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         b.email.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || b.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
-
-  const getStatusBadge = (status: string) => {
-    const styles: Record<string, string> = {
-      pending: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-      confirmed: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-      paid: 'bg-green-500/20 text-green-400 border-green-500/30',
-      cancelled: 'bg-red-500/20 text-red-400 border-red-500/30'
-    };
-    return styles[status] || styles.pending;
-  };
-
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={`max-w-6xl max-h-[90vh] overflow-hidden ${isDark ? 'bg-[#141B24] border-white/10 text-ivory' : 'bg-white border-gray-200'}`}>
-        <DialogHeader>
-          <DialogTitle className={`text-xl ${isDark ? 'text-ivory' : 'text-gray-900'}`}>
-            Admin Panelė
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="flex h-[70vh]">
-          {/* Sidebar */}
-          <div className={`w-48 border-r ${isDark ? 'border-white/10' : 'border-gray-200'} pr-4`}>
-            <nav className="space-y-1">
-              {[
-                { id: 'dashboard', label: 'Dashboard', icon: TrendingUp },
-                { id: 'bookings', label: 'Užsakymai', icon: Calendar },
-                { id: 'customers', label: 'Klientai', icon: Users },
-                { id: 'revenue', label: 'Pajamos', icon: DollarSign },
-                { id: 'settings', label: 'Nustatymai', icon: Info },
-              ].map(item => (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-colors ${
-                    activeTab === item.id 
-                      ? 'bg-gold text-[#0B0F17]' 
-                      : isDark ? 'text-slate hover:bg-white/5' : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  <item.icon className="w-4 h-4" />
-                  {item.label}
-                </button>
-              ))}
-            </nav>
-          </div>
-
-          {/* Content */}
-          <div className="flex-1 overflow-auto pl-4">
-            {activeTab === 'dashboard' && (
-              <div className="space-y-6">
-                <div className="grid grid-cols-4 gap-4">
-                  <Card className={`${isDark ? 'bg-[#0B0F17] border-white/10' : 'bg-gray-50'}`}>
-                    <CardContent className="p-4">
-                      <p className="text-slate text-sm">Viso užsakymų</p>
-                      <p className="text-2xl font-bold text-gold">{stats.totalBookings}</p>
-                    </CardContent>
-                  </Card>
-                  <Card className={`${isDark ? 'bg-[#0B0F17] border-white/10' : 'bg-gray-50'}`}>
-                    <CardContent className="p-4">
-                      <p className="text-slate text-sm">Laukiantys</p>
-                      <p className="text-2xl font-bold text-yellow-400">{stats.pendingBookings}</p>
-                    </CardContent>
-                  </Card>
-                  <Card className={`${isDark ? 'bg-[#0B0F17] border-white/10' : 'bg-gray-50'}`}>
-                    <CardContent className="p-4">
-                      <p className="text-slate text-sm">Pajamos (€)</p>
-                      <p className="text-2xl font-bold text-green-400">{stats.totalRevenue.toLocaleString()}</p>
-                    </CardContent>
-                  </Card>
-                  <Card className={`${isDark ? 'bg-[#0B0F17] border-white/10' : 'bg-gray-50'}`}>
-                    <CardContent className="p-4">
-                      <p className="text-slate text-sm">Šiandien</p>
-                      <p className="text-2xl font-bold text-blue-400">{stats.todayBookings}</p>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                <div>
-                  <h3 className={`font-semibold mb-4 ${isDark ? 'text-ivory' : 'text-gray-900'}`}>Naujausi užsakymai</h3>
-                  <div className="space-y-2">
-                    {allBookings.slice(0, 5).map(booking => (
-                      <div key={booking.id} className={`flex items-center justify-between p-3 rounded-lg ${isDark ? 'bg-[#0B0F17]' : 'bg-gray-50'}`}>
-                        <div>
-                          <p className="font-medium text-ivory">{booking.customer}</p>
-                          <p className="text-sm text-slate">{booking.item}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-bold text-gold">{booking.total}€</p>
-                          <Badge variant="outline" className={getStatusBadge(booking.status)}>
-                            {booking.status}
-                          </Badge>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'bookings' && (
-              <div className="space-y-4">
-                <div className="flex gap-4">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate" />
-                    <Input 
-                      placeholder="Ieškoti pagal vardą, ID ar email..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className={`pl-10 ${isDark ? 'bg-[#0B0F17] border-white/10' : 'bg-gray-50'}`}
-                    />
-                  </div>
-                  <select 
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className={`px-4 py-2 rounded-lg ${isDark ? 'bg-[#0B0F17] border border-white/10 text-ivory' : 'bg-gray-50 border border-gray-200'}`}
-                  >
-                    <option value="all">Visi statusai</option>
-                    <option value="pending">Laukiantys</option>
-                    <option value="confirmed">Patvirtinti</option>
-                    <option value="paid">Apmokėti</option>
-                    <option value="cancelled">Atšaukti</option>
-                  </select>
-                  <Button variant="outline" className="border-white/10">
-                    <Download className="w-4 h-4 mr-2" />
-                    Eksportuoti
-                  </Button>
-                </div>
-
-                <div className={`rounded-lg overflow-hidden ${isDark ? 'bg-[#0B0F17]' : 'bg-gray-50'}`}>
-                  <table className="w-full">
-                    <thead className={`${isDark ? 'bg-[#141B24]' : 'bg-gray-100'}`}>
-                      <tr>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-slate">ID</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-slate">Klientas</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-slate">Paslauga</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-slate">Data</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-slate">Suma</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-slate">Statusas</th>
-                        <th className="px-4 py-3 text-left text-sm font-medium text-slate">Veiksmai</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredBookings.map(booking => (
-                        <tr key={booking.id} className={`border-t ${isDark ? 'border-white/10' : 'border-gray-200'}`}>
-                          <td className="px-4 py-3 text-sm">{booking.id}</td>
-                          <td className="px-4 py-3">
-                            <p className="text-sm font-medium">{booking.customer}</p>
-                            <p className="text-xs text-slate">{booking.email}</p>
-                          </td>
-                          <td className="px-4 py-3 text-sm">{booking.item}</td>
-                          <td className="px-4 py-3 text-sm">{booking.checkIn}</td>
-                          <td className="px-4 py-3 text-sm font-bold text-gold">{booking.total}€</td>
-                          <td className="px-4 py-3">
-                            <Badge variant="outline" className={getStatusBadge(booking.status)}>
-                              {booking.status}
-                            </Badge>
-                          </td>
-                          <td className="px-4 py-3">
-                            <div className="flex gap-2">
-                              <button className="p-1 hover:bg-white/10 rounded"><Eye className="w-4 h-4 text-slate" /></button>
-                              <button className="p-1 hover:bg-white/10 rounded"><Edit className="w-4 h-4 text-blue-400" /></button>
-                              <button className="p-1 hover:bg-white/10 rounded"><CheckCircle className="w-4 h-4 text-green-400" /></button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
 // Main App
 function App() {
   const [isDark, setIsDark] = useState(true);
@@ -991,7 +782,7 @@ function App() {
             onSuccess={() => setIsDashboardOpen(true)} 
           />
           <UserDashboardModal isOpen={isDashboardOpen} onClose={() => setIsDashboardOpen(false)} />
-          <AdminPanelModal isOpen={isAdminOpen} onClose={() => setIsAdminOpen(false)} />
+          <AdminDashboard isOpen={isAdminOpen} onClose={() => setIsAdminOpen(false)} />
         </div>
       </AuthContext.Provider>
     </ThemeContext.Provider>
